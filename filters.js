@@ -1,4 +1,5 @@
 import FilterValues from './filterValues.js';
+import mixinClickOutside from './mixinClickOutside.js';
 
 export default {
 
@@ -6,6 +7,8 @@ export default {
     criterias: Array,
     filters: FilterValues,
   },
+
+  mixins: [mixinClickOutside],
 
   components: {
     inputfreetext: () => import('./inputFreeText.js'),
@@ -57,7 +60,7 @@ export default {
               v-for="criteria in criterias"
               :title="criteriaTitle(criteria)"
               :class="{'filter-criteria-label': true, selected: criteriaIdOpened === criteria.id, disabled: isCompatible(criteria.id) === false}"
-              @click="switchCriteriaVisibility(criteria.id)"
+              @click.stop="switchCriteriaVisibility(criteria.id)"
             >
               {{ criteria.label }}
             </div>
@@ -72,6 +75,7 @@ export default {
               :criteria="criteria"
               @changed="onFilterChanged"
               :valueProp="filters.getValue(criteria.id)"
+              v-click-outside="() => switchCriteriaVisibility(criteria.id)"
             ></component>
           </div>
 
@@ -93,7 +97,7 @@ export default {
         this.criteriaIdOpened = undefined;
         return;
       }
-
+      
       this.criteriaIdOpened = criteriaId;
     },
 
