@@ -27,6 +27,7 @@
 
 .filter-criteria-list {
   display: flex;
+  align-items: flex-start;
 }
 
 .filter-criteria-labels{
@@ -51,6 +52,9 @@
 
 .filter-criteria-input{
   padding: 8px;
+  background-color: white;
+  border: 2px solid #0097ee;
+  border-radius: 5px;
 }
 
 .filter-criteria-input button.active{

@@ -22,7 +22,7 @@ export default {
   data: function() {
     return {
       isOpen: false,
-      criteriaIdOpened: undefined,
+      openedCriteriaId: undefined,
     };
   },
   
@@ -59,25 +59,23 @@ export default {
             <div
               v-for="criteria in criterias"
               :title="criteriaTitle(criteria)"
-              :class="{'filter-criteria-label': true, selected: criteriaIdOpened === criteria.id, disabled: isCompatible(criteria.id) === false}"
+              :class="{'filter-criteria-label': true, selected: openedCriteriaId === criteria.id, disabled: isCompatible(criteria.id) === false}"
               @click.stop="switchCriteriaVisibility(criteria.id)"
             >
               {{ criteria.label }}
             </div>
           </div>
 
-          <div class="filter-criteria-input">
-            <component
-             v-for="criteria in criterias"
-              v-if="criteriaIdOpened === criteria.id"
-              v-bind:is="'input' + criteria.type"
-              v-bind:key="criteria.id"
-              :criteria="criteria"
-              @changed="onFilterChanged"
-              :valueProp="filters.getValue(criteria.id)"
-              v-click-outside="() => switchCriteriaVisibility(criteria.id)"
-            ></component>
-          </div>
+          <component
+            v-for="criteria in criterias"
+            v-if="openedCriteriaId === criteria.id"
+            v-bind:is="'input' + criteria.type"
+            v-bind:key="criteria.id"
+            :criteria="criteria"
+            @changed="onFilterChanged"
+            :valueProp="filters.getValue(criteria.id)"
+            v-click-outside="() => switchCriteriaVisibility(criteria.id)"
+          ></component>
 
       </div>
     </div>
@@ -93,12 +91,12 @@ export default {
       if (this.isCompatible(criteriaId) === false) {
         return;
       }
-      if (criteriaId === this.criteriaIdOpened) {
-        this.criteriaIdOpened = undefined;
+      if (criteriaId === this.openedCriteriaId) {
+        this.openedCriteriaId = undefined;
         return;
       }
       
-      this.criteriaIdOpened = criteriaId;
+      this.openedCriteriaId = criteriaId;
     },
 
     onFilterChanged: function(criteria) {

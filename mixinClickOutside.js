@@ -5,7 +5,6 @@ export default {
             const bubble = binding.modifiers.bubble
             const handler = (e) => {
               if (bubble || (!el.contains(e.target) && el !== e.target)) {
-                console.log('Call');
                   binding.value(e)
               }
             }

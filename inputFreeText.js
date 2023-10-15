@@ -11,7 +11,7 @@ export default {
     };
   },
 
-  template: `<div>
+  template: `<div class="filter-criteria-input">
     <input type="text" v-model="searchValue" ref="input"> <button @click="valid">OK</button>
   </div>`,
 

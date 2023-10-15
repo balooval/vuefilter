@@ -13,7 +13,7 @@ export default {
     };
   },
   
-  template: `<div>
+  template: `<div class="filter-criteria-input">
       <button @click="switchSelectAll">All</button> <input type="text" v-model="optionFilter">
       
       <div v-for="option in visibleOptions">
@@ -27,10 +27,8 @@ export default {
         <label :for="option.id">{{ option.label }}</label>
       </div>
 
-      <div v-if="optionsAreLimited">
-        <div @click="toggleViewAllOptions">
-          Afficher {{ hiddenOptionsCount }} de plus
-        </div>
+      <div v-if="optionsAreLimited" @click.stop="toggleViewAllOptions">
+        Afficher {{ hiddenOptionsCount }} de plus
       </div>
 
     </div>`,
@@ -41,6 +39,7 @@ export default {
     },
 
     toggleViewAllOptions: function() {
+      console.log('toggleViewAllOptions');
       this.viewAllOptions = !this.viewAllOptions;
     },
 

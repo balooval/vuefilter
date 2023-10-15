@@ -13,7 +13,7 @@ export default {
     };
   },
 
-  template: `<div>
+  template: `<div class="filter-criteria-input">
       <date-picker
         :inline="true"
         :range="isRangeMode"
