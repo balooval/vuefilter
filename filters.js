@@ -55,7 +55,8 @@ export default {
           <div class="filter-criteria-labels">
             <div
               v-for="criteria in criterias"
-              :class="{'filter-criteria-label': true, selected: criteriaIdOpened === criteria.id}"
+              :title="criteriaTitle(criteria)"
+              :class="{'filter-criteria-label': true, selected: criteriaIdOpened === criteria.id, disabled: isCompatible(criteria.id) === false}"
               @click="switchCriteriaVisibility(criteria.id)"
             >
               {{ criteria.label }}
@@ -85,6 +86,9 @@ export default {
     },
 
     switchCriteriaVisibility: function(criteriaId) {
+      if (this.isCompatible(criteriaId) === false) {
+        return;
+      }
       if (criteriaId === this.criteriaIdOpened) {
         this.criteriaIdOpened = undefined;
         return;
@@ -93,8 +97,37 @@ export default {
       this.criteriaIdOpened = criteriaId;
     },
 
-    onFilterChanged: function() {
+    onFilterChanged: function(criteria) {
+      if (this.filters.isActive(criteria.id) === true) {
+        this.clearIncompatibleCriterias(criteria);
+      }
       this.filters.persist();
+    },
+
+    clearIncompatibleCriterias(criteria) {
+      const incompatibleCriterias = criteria.incompatibleWith ?? [];
+      incompatibleCriterias.forEach(criteriaId => this.filters.reset(criteriaId));
+    },
+
+    isCompatible: function(criteriaId) {
+      const incompatiblesCriteria = this.criterias
+      .filter(criteria => this.filters.isActive(criteria.id))
+      .filter(criteria => criteria.incompatibleWith)
+      .reduce((cum, cur) => {
+        cum.push(...cur.incompatibleWith);
+        return cum;
+      }, []);
+
+      return incompatiblesCriteria.includes(criteriaId) === false;
+    },
+
+    criteriaTitle: function(criteria) {
+      let title = criteria.label;
+      if (this.isCompatible(criteria.id) === false) {
+        title += ' (incompatible avec un filtre en cours)';
+      }
+
+      return title;
     },
   },
 

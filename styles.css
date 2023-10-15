@@ -41,6 +41,10 @@
   padding: 8px;
 }
 
+.filter-criteria-label.disabled{
+  background-color: red;
+}
+
 .filter-criteria-label:hover, .filter-criteria-label.selected{
   background-color: #EEE;
 }

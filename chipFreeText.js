@@ -12,7 +12,7 @@ export default {
   methods: { 
     clear: function() {
       this.valueProp.value = '';
-      this.$emit('clear');
+      this.$emit('clear', this.criteria);
     },
   },
 };

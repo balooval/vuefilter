@@ -37,7 +37,7 @@ export default {
 
   methods: { 
     onChange: function() {
-      this.$emit('changed');
+      this.$emit('changed', this.criteria);
     },
 
     toggleViewAllOptions: function() {

@@ -18,6 +18,11 @@ class FilterValues {
     const valueProp = this.valuesProps.filter(value => value.id === id).pop();
     return valueProp;
   }
+
+  reset(id) {
+    const valueProp = this.getValue(id);
+    valueProp.value = getDefaultValue(valueProp.type);
+  }
   
   isActive(id) {
     const valueProp = this.getValue(id);

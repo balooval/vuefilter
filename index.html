@@ -35,10 +35,11 @@
     import FilterValues from './filterValues.js';
 
     const criterias = [
-        {
+    {
             id: 'name',
             label: 'Nom',
             type: 'freetext',
+            incompatibleWith: ['birthdate', 'animal'],
         },
         {
             id: 'birthdate',

@@ -49,7 +49,7 @@ export default {
           break;
       }
       this.isOpen = false;
-      this.$emit('changed');
+      this.$emit('changed', this.criteria);
     },
 
     setSelectionMode: function(mode) {

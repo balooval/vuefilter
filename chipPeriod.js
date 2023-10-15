@@ -18,7 +18,7 @@ export default {
         start: null,
         end: null,
       };
-      this.$emit('clear');
+      this.$emit('clear', this.criteria);
     },
 
     humanDate: function (value) {
