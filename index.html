@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>VueJS - Filtres</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="styles.css">
+    <link href="./vendor/datepicker/index.css" rel="stylesheet" type="text/css" >
+</head>
+
+<body>
+    <div id="app">
+        <filters
+            :criterias="criterias"
+            :filters="filters"
+        >
+        </filters>
+
+        <br>
+        <br>
+
+        <div v-for="valueProp in filters.valuesProps">
+            {{ valueProp.id }} : {{ valueProp.value }}
+        </div>
+
+        <div v-for="row in filteredDatas">
+            {{ row }}
+        </div>
+    </div>
+
+<script src="./vue.js"></script>
+<script src="./vendor/datepicker/index.min.js"></script>
+<script src="./vendor/datepicker/fr.js"></script>
+
+<script type="module">
+    import FilterValues from './filterValues.js';
+
+    const criterias = [
+        {
+            id: 'name',
+            label: 'Nom',
+            type: 'freetext',
+        },
+        {
+            id: 'birthdate',
+            label: 'Date de naissance',
+            type: 'period',
+            // dateType: 'month',
+        },
+        {
+            id: 'animal',
+            label: 'Animaux',
+            type: 'checklist',
+            options: [
+                {id: 'cat', label: 'Chat'},
+                {id: 'dog', label: 'Chien'},
+                {id: 'fish', label: 'Poisson'},
+                {id: 'bird', label: 'Oiseau'},
+                {id: 'cow', label: 'Vache'},
+                {id: 'pig', label: 'Cochon'},
+                {id: 'sheep', label: 'Mouton'},
+            ],
+        },
+    ];
+
+    const filterValues = new FilterValues({criterias, sessionKey: 'collab'});
+    // filterValues.addValue('name', 'toto');
+    // filterValues.addValue('animal', ['cat']);
+    // filterValues.addValue('birthdate', {start: '2020-01-01', end: '2023-05-26'});
+
+    const names = [
+        'AAAA',
+        'BBBB',
+        'CCCC',
+        'DDDD',
+        'EEEE',
+        'FFFF',
+        'GGGG',
+    ];
+    const birthDates = [
+        '1980-01-01',
+        '1980-06-15',
+        '1981-08-22',
+        '1988-03-30',
+        '2010-09-12',
+        '2025-02-17',
+    ];
+    const animals = [
+        'cat',
+        'fish',
+        'cow',
+        'dog',
+    ];
+
+    const datas = [];
+
+    names.forEach(name => {
+        birthDates.forEach(date => {
+            animals.forEach(animal => {
+                datas.push({
+                    name: name,
+                    birthdate: date,
+                    animal: animal,
+                });
+            })
+        });
+    });
+    console.log(datas);
+
+    Vue.use(DatePicker);
+
+    const app = new Vue({
+        el: '#app',
+
+        components: {
+            'filters': () => import('./filters.js'),
+        },
+        
+        data: {
+            criterias: criterias,
+            filters: filterValues,
+            datas: datas,
+        },
+
+        computed: {
+            filteredDatas: function() {
+                let res = this.datas;
+                this.filters.valuesProps.forEach(prop => {
+                    res = res.filter(row => {
+                        if (prop.type === 'freetext' && prop.value !== '') {
+                            return row[prop.id].includes(prop.value);
+                        }
+                        if (prop.type === 'checklist' && prop.value.length > 0) {
+                            return prop.value.includes(row[prop.id]);
+                        }
+                        if (prop.type === 'period') {
+                            const startDate = new Date(prop.value.start ?? '1900-01-01');
+                            const endDate = new Date(prop.value.end ?? '2099-12-31');
+                            const currentDate = new Date(row[prop.id]);
+                            if (startDate > currentDate) {
+                                return false;
+                            }
+                            if (endDate < currentDate) {
+                                return false;
+                            }
+                            return true;
+                        }
+                        return true;
+                    });
+                });
+
+                return res;
+            },
+        }
+    });
+
+</script>
+
+</body>
+</html>

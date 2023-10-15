@@ -1,0 +1,1 @@
+Simple search filter in VueJs 2.

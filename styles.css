@@ -1,0 +1,72 @@
+*{
+  font-family: Poppins, sans-serif;
+}
+
+.filter-container {
+  border: 1px solid blue;
+}
+
+.filter-input-zone {
+  
+}
+
+.filter-resume-zone {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.filter-main-button{
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  padding: 8px;
+  cursor: pointer;
+  background-color: #0097ee;
+  border-radius: 50%;
+}
+
+.filter-criteria-list {
+  display: flex;
+}
+
+.filter-criteria-labels{
+  border: 1px solid green;
+  border-bottom: none;
+  flex-basis: 300px;
+}
+
+.filter-criteria-label{
+  cursor: pointer;
+  border-bottom: 1px solid green;
+  padding: 8px;
+}
+
+.filter-criteria-label:hover, .filter-criteria-label.selected{
+  background-color: #EEE;
+}
+
+.filter-criteria-input{
+  padding: 8px;
+}
+
+.filter-criteria-input button.active{
+  background-color: white;
+}
+
+.filter-current-search-container{
+  border: 1px solid black;
+}
+
+.filter-chip{
+  background-color: white;
+  border: 2px solid #0097ee;
+  border-radius: 24px;
+  display: inline-flex;
+  align-items: center;
+  padding: 8px;
+  margin: 8px;
+}
+
+.filter-chip-text {
+  margin: 0 8px;
+}
