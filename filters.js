@@ -11,11 +11,13 @@ export default {
   mixins: [mixinClickOutside],
 
   components: {
-    inputfreetext: () => import('./inputFreeText.js'),
     inputchecklist: () => import('./inputCheckList.js'),
+    inputexclusivelist: () => import('./inputExclusiveList.js'),
+    inputfreetext: () => import('./inputFreeText.js'),
     inputperiod: () => import('./inputPeriod.js'),
-    chipfreetext: () => import('./chipFreeText.js'),
+    chipexclusivelist: () => import('./chipExclusiveList.js'),
     chipchecklist: () => import('./chipCheckList.js'),
+    chipfreetext: () => import('./chipFreeText.js'),
     chipperiod: () => import('./chipPeriod.js'),
   },
 

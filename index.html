@@ -58,7 +58,7 @@
         {
             id: 'animal',
             label: 'Animaux',
-            type: 'checklist',
+            type: 'exclusivelist',
             options: [
                 {id: 'cat', label: 'Chat'},
                 {id: 'dog', label: 'Chien'},
@@ -135,7 +135,7 @@
                 let res = this.datas;
                 this.filters.valuesProps.forEach(prop => {
                     res = res.filter(row => {
-                        if ((prop.type === 'freetext' || prop.type === 'textautocomplete') && prop.value !== '') {
+                        if ((prop.type === 'freetext' || prop.type === 'exclusivelist') && prop.value !== '') {
                             return row[prop.id].toLowerCase().includes(prop.value.toLowerCase());
                         }
                         if (prop.type === 'checklist' && prop.value.length > 0) {

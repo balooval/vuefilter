@@ -60,6 +60,7 @@ function initValue(criteria) {
 function getDefaultValue(type) {
   switch (type) {
     case 'freetext':
+    case 'exclusivelist':
       return '';
     case 'checklist':
       return [];
