@@ -39,7 +39,15 @@
             id: 'name',
             label: 'Nom',
             type: 'freetext',
-            incompatibleWith: ['birthdate', 'animal'],
+            suggestions: [
+                'AAAA',
+                'ABBB',
+                'BBCC',
+                'ABCD',
+                'DDDE',
+                'DEEF',
+                'GGGG',
+            ],
         },
         {
             id: 'birthdate',
@@ -70,11 +78,11 @@
 
     const names = [
         'AAAA',
-        'BBBB',
-        'CCCC',
-        'DDDD',
-        'EEEE',
-        'FFFF',
+        'ABBB',
+        'BBCC',
+        'ABCD',
+        'DDDE',
+        'DEEF',
         'GGGG',
     ];
     const birthDates = [
@@ -127,8 +135,8 @@
                 let res = this.datas;
                 this.filters.valuesProps.forEach(prop => {
                     res = res.filter(row => {
-                        if (prop.type === 'freetext' && prop.value !== '') {
-                            return row[prop.id].includes(prop.value);
+                        if ((prop.type === 'freetext' || prop.type === 'textautocomplete') && prop.value !== '') {
+                            return row[prop.id].toLowerCase().includes(prop.value.toLowerCase());
                         }
                         if (prop.type === 'checklist' && prop.value.length > 0) {
                             return prop.value.includes(row[prop.id]);
