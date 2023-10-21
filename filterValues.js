@@ -1,6 +1,7 @@
 class FilterValues {
 
   constructor({criterias, sessionKey = ''}) {
+    this.criterias = criterias;
     this.valuesProps = criterias.map(initValue);
     this.sessionKey = 'filter-' + sessionKey;
     this.load();
@@ -27,11 +28,11 @@ class FilterValues {
   isActive(id) {
     const valueProp = this.getValue(id);
     const value = valueProp.value;
-
+    
     if (valueProp.type === 'period') {
       return value.start !== null || value.end !== null;
     }
-
+    
     return value.length > 0;
   }
 

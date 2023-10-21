@@ -1,3 +1,5 @@
+import {defineAsyncComponent , ref, reactive } from './vue3.js';
+
 export default {
 
   props: {
@@ -5,22 +7,34 @@ export default {
     valueProp: Object,
   },
 
-  template: `<div class="filter-chip">
-      <div class="filter-chip-text">{{ criteria.label }} : {{ formatValues(valueProp.value) }}</div> <button @click="clear">X</button>
-    </div>`,
+  setup(props, context) {
 
-  methods: { 
-    clear: function() {
-      this.valueProp.value = [];
-      this.$emit('clear', this.criteria);
-    },
+    const criteriaData = props.criteria;
+    const chosenValues = reactive(props.valueProp);
 
-    formatValues(values) {
-      const labels = values.map(id => {
-        return this.criteria.options.filter(option => option.id === id).pop().label;
+
+    function formatValues(valueObject) {
+      const labels = valueObject.value.map(id => {
+        return criteriaData.options.filter(option => option.id === id).pop().label;
       })
       return labels.join(', ');
-    },
+    }
+
+    function clear() {
+      chosenValues.value = [];
+      context.emit('clear', criteriaData);
+    }
+
+    return {
+      criteriaData,
+      chosenValues,
+      formatValues,
+      clear,
+    };
   },
+
+  template: `<div class="filter-chip">
+      <div class="filter-chip-text">{{ criteriaData.label }} : {{ formatValues(chosenValues) }}</div> <button @click="clear">X</button>
+    </div>`,
 
 };

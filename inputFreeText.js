@@ -1,3 +1,5 @@
+import {ref} from './vue3.js';
+
 export default {
 
   props: {
@@ -5,9 +7,25 @@ export default {
     valueProp: Object,
   },
 
-  data: function() {
+  setup(props, context) {
+
+    const searchValue = ref('');
+
+    function pickSuggestion(value) {
+      searchValue.value = value;
+      valid();
+    }
+
+    function valid() {
+      props.valueProp.value = searchValue.value;
+      searchValue.value = '';
+      context.emit('changed', props.criteria);
+    }
+
     return {
-      searchValue: '',
+      pickSuggestion,
+      valid,
+      searchValue,
     };
   },
 
@@ -20,19 +38,6 @@ export default {
 
   mounted() {
     this.$refs.input.focus();
-  },
-
-  methods: { 
-    pickSuggestion: function(value) {
-      this.searchValue = value;
-      this.valid();
-    },
-
-    valid: function() {
-      this.valueProp.value = this.searchValue;
-      this.searchValue = '';
-      this.$emit('changed', this.criteria);
-    },
   },
 
   computed: { 

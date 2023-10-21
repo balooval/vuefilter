@@ -1,30 +1,92 @@
+import {defineAsyncComponent , ref, reactive } from './vue3.js';
 import FilterValues from './filterValues.js';
 import mixinClickOutside from './mixinClickOutside.js';
 
 export default {
 
   props: {
-    criterias: Array,
+    criteriasprop: Array,
     filters: FilterValues,
   },
 
   mixins: [mixinClickOutside],
 
   components: {
-    inputchecklist: () => import('./inputCheckList.js'),
-    inputexclusivelist: () => import('./inputExclusiveList.js'),
-    inputfreetext: () => import('./inputFreeText.js'),
-    inputperiod: () => import('./inputPeriod.js'),
-    chipexclusivelist: () => import('./chipExclusiveList.js'),
-    chipchecklist: () => import('./chipCheckList.js'),
-    chipfreetext: () => import('./chipFreeText.js'),
-    chipperiod: () => import('./chipPeriod.js'),
+    inputchecklist: defineAsyncComponent(() => import('./inputCheckList.js')),
+    inputexclusivelist: defineAsyncComponent(() => import('./inputExclusiveList.js')),
+    inputfreetext: defineAsyncComponent(() => import('./inputFreeText.js')),
+    inputperiod: defineAsyncComponent(() => import('./inputPeriod.js')),
+    chipexclusivelist: defineAsyncComponent(() => import('./chipExclusiveList.js')),
+    chipchecklist: defineAsyncComponent(() => import('./chipCheckList.js')),
+    chipfreetext: defineAsyncComponent(() => import('./chipFreeText.js')),
+    chipperiod: defineAsyncComponent(() => import('./chipPeriod.js')),
   },
 
-  data: function() {
+  setup(props) {
+
+    const criteriasData = reactive(props.criteriasprop);
+    const filtersData = reactive(props.filters);
+    let isOpen = ref(false);
+    let openedCriteriaId = ref(null);
+
+    function toggleOpenState() {
+      isOpen.value = !isOpen.value;
+    }
+
+    function switchCriteriaVisibility(criteriaId) {
+      if (isCompatible(criteriaId) === false) {
+        return;
+      }
+      if (criteriaId === openedCriteriaId.value) {
+        openedCriteriaId.value = null;
+        return;
+      }
+      
+      openedCriteriaId.value = criteriaId;
+    }
+
+    function isCompatible(criteriaId) {
+      const incompatiblesCriteria = criteriasData
+      .filter(criteria => filtersData.isActive(criteria.id))
+      .filter(criteria => criteria.incompatibleWith)
+      .reduce((cum, cur) => {
+        cum.push(...cur.incompatibleWith);
+        return cum;
+      }, []);
+      return incompatiblesCriteria.includes(criteriaId) === false;
+    }
+
+
+    function onFilterChanged(criteria) {
+      if (filtersData.isActive(criteria.id) === true) {
+        clearIncompatibleCriterias(criteria);
+      }
+      filtersData.persist();
+    }
+
+    function clearIncompatibleCriterias(criteria) {
+      const incompatibleCriterias = criteria.incompatibleWith ?? [];
+      incompatibleCriterias.forEach(criteriaId => filtersData.reset(criteriaId));
+    }
+
+    function criteriaTitle(criteria) {
+      let title = criteria.label;
+      if (isCompatible(criteria.id) === false) {
+        title += ' (incompatible avec un filtre en cours)';
+      }
+      return title;
+    }
+
     return {
-      isOpen: false,
-      openedCriteriaId: undefined,
+      filtersData,
+      switchCriteriaVisibility,
+      criteriasData,
+      isOpen,
+      openedCriteriaId,
+      toggleOpenState,
+      criteriaTitle,
+      onFilterChanged,
+      isCompatible,
     };
   },
   
@@ -39,16 +101,17 @@ export default {
         </div>
 
         <div class="filter-current-search-container">
-          <component
-            v-for="criteria in criterias"
-            v-if="filters.isActive(criteria.id)"
-            v-bind:is="'chip' + criteria.type"
-            v-bind:key="criteria.id"
-            v-bind:criteria="criteria"
-            v-bind:valueProp="filters.getValue(criteria.id)"
-            @clear="onFilterChanged"
-          >
-          </component>
+          <div v-for="criteriaItem in criteriasData">
+            <component
+              v-if="filtersData.isActive(criteriaItem.id)"
+              v-bind:is="'chip' + criteriaItem.type"
+              v-bind:key="criteriaItem.id"
+              v-bind:criteria="criteriaItem"
+              v-bind:valueProp="filtersData.getValue(criteriaItem.id)"
+              @clear="onFilterChanged"
+            >
+            </component>
+          </div>
         </div>
 
       </div>
@@ -59,80 +122,30 @@ export default {
 
           <div class="filter-criteria-labels">
             <div
-              v-for="criteria in criterias"
-              :title="criteriaTitle(criteria)"
-              :class="{'filter-criteria-label': true, selected: openedCriteriaId === criteria.id, disabled: isCompatible(criteria.id) === false}"
-              @click.stop="switchCriteriaVisibility(criteria.id)"
+              v-for="criteriaItem in criteriasData"
+              :title="criteriaTitle(criteriaItem)"
+              :class="{'filter-criteria-label': true, selected: openedCriteriaId === criteriaItem.id, disabled: isCompatible(criteriaItem.id) === false}"
+              @click.stop="switchCriteriaVisibility(criteriaItem.id)"
             >
-              {{ criteria.label }}
+              {{ criteriaItem.label }}
             </div>
           </div>
 
-          <component
-            v-for="criteria in criterias"
-            v-if="openedCriteriaId === criteria.id"
-            v-bind:is="'input' + criteria.type"
-            v-bind:key="criteria.id"
-            :criteria="criteria"
-            @changed="onFilterChanged"
-            :valueProp="filters.getValue(criteria.id)"
-            v-click-outside="() => switchCriteriaVisibility(criteria.id)"
-          ></component>
+          <div v-for="criteriaItem in criteriasData">
+            <component
+              v-if="openedCriteriaId === criteriaItem.id"
+              v-bind:is="'input' + criteriaItem.type"
+              v-bind:key="criteriaItem.id"
+              :criteria="criteriaItem"
+              @changed="onFilterChanged"
+              :valueProp="filtersData.getValue(criteriaItem.id)"
+              v-click-outside="() => switchCriteriaVisibility(criteriaItem.id)"
+            ></component>
 
+        </div>
       </div>
     </div>
 
   </div>`,
-
-  methods: { 
-    toggleOpenState: function() {
-      this.isOpen = !this.isOpen;
-    },
-
-    switchCriteriaVisibility: function(criteriaId) {
-      if (this.isCompatible(criteriaId) === false) {
-        return;
-      }
-      if (criteriaId === this.openedCriteriaId) {
-        this.openedCriteriaId = undefined;
-        return;
-      }
-      
-      this.openedCriteriaId = criteriaId;
-    },
-
-    onFilterChanged: function(criteria) {
-      if (this.filters.isActive(criteria.id) === true) {
-        this.clearIncompatibleCriterias(criteria);
-      }
-      this.filters.persist();
-    },
-
-    clearIncompatibleCriterias(criteria) {
-      const incompatibleCriterias = criteria.incompatibleWith ?? [];
-      incompatibleCriterias.forEach(criteriaId => this.filters.reset(criteriaId));
-    },
-
-    isCompatible: function(criteriaId) {
-      const incompatiblesCriteria = this.criterias
-      .filter(criteria => this.filters.isActive(criteria.id))
-      .filter(criteria => criteria.incompatibleWith)
-      .reduce((cum, cur) => {
-        cum.push(...cur.incompatibleWith);
-        return cum;
-      }, []);
-
-      return incompatiblesCriteria.includes(criteriaId) === false;
-    },
-
-    criteriaTitle: function(criteria) {
-      let title = criteria.label;
-      if (this.isCompatible(criteria.id) === false) {
-        title += ' (incompatible avec un filtre en cours)';
-      }
-
-      return title;
-    },
-  },
 
 };

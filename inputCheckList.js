@@ -1,3 +1,5 @@
+import {ref} from './vue3.js';
+
 export default {
 
   props: {
@@ -5,11 +7,47 @@ export default {
     valueProp: Object,
   },
 
-  data: function() {
+  setup(props, context) {
+
+    const visibleCriteriasCount = ref(4);
+    const viewAllOptions = ref(false);
+    const optionFilter = ref('');
+
+    function onChange() {
+      context.emit('changed', props.criteria);
+    }
+
+    function toggleViewAllOptions() {
+      viewAllOptions.value = !viewAllOptions.value;
+    }
+
+    function switchSelectAll() {
+      if (props.valueProp.value.length === props.criteria.options.length) {
+        selectNone();
+      } else {
+        selectAll();
+      }
+    }
+
+    function selectAll() {
+      props.valueProp.value = props.criteria.options.map(option => option.id);
+      context.emit('changed', props.criteria);
+    }
+
+    function selectNone() {
+      props.valueProp.value = [];
+      context.emit('changed', props.criteria);
+    }
+
     return {
-      visibleCriteriasCount: 4,
-      viewAllOptions: false,
-      optionFilter: '',
+      visibleCriteriasCount,
+      viewAllOptions,
+      optionFilter,
+      onChange,
+      toggleViewAllOptions,
+      switchSelectAll,
+      selectAll,
+      selectNone,
     };
   },
   
@@ -32,35 +70,6 @@ export default {
       </div>
 
     </div>`,
-
-  methods: { 
-    onChange: function() {
-      this.$emit('changed', this.criteria);
-    },
-
-    toggleViewAllOptions: function() {
-      console.log('toggleViewAllOptions');
-      this.viewAllOptions = !this.viewAllOptions;
-    },
-
-    switchSelectAll: function() {
-      if (this.valueProp.value.length === this.criteria.options.length) {
-        this.selectNone();
-      } else {
-        this.selectAll();
-      }
-    },
-
-    selectAll: function() {
-      this.valueProp.value = this.criteria.options.map(option => option.id);
-      this.$emit('changed');
-    },
-
-    selectNone: function() {
-      this.valueProp.value = [];
-      this.$emit('changed');
-    },
-  },
   
   computed: { 
     hiddenOptionsCount: function() {
